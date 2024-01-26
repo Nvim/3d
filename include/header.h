@@ -41,8 +41,8 @@ typedef struct {
   u8 a;
 } s_Color;
 
-const int ScreenWidth = 512;
-const int ScreenHeight = 512;
+const extern int ScreenWidth;
+const extern int ScreenHeight;
 
 typedef struct {
   double x, y, z;
@@ -63,6 +63,10 @@ typedef struct {
 extern triangle cubeMesh[12]; // 12 triangles, 2 par face
 //
 void init_cube();
-void render_triangle(s_Color *colors, triangle tri);
+u8 init_window();
+void window_clear();
+void window_display();
+void render_triangle(s_Color *colors, triangle *tri);
+void render_rectangle(SDL_Rect *rect, s_Color *colors);
 
 #endif
