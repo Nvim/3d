@@ -57,8 +57,6 @@ void render_triangle(s_Color *colors, triangle *tri) {
 }
 
 void window_clear() {
-  // SDL_SetRenderDrawColor(game.renderer, bgColor.r, bgColor.g, bgColor.b,
-  // 255);
   SDL_SetRenderDrawColor(game.renderer, bgColor.r, bgColor.g, bgColor.b, 255);
   SDL_RenderClear(game.renderer);
 }

@@ -5,8 +5,8 @@ s_Color cubeColors = {255, 255, 255, 255};
 
 triangle cubeMesh[12];
 s_Game game;
-const int ScreenWidth = 512;
-const int ScreenHeight = 512;
+const int ScreenWidth = 1024;
+const int ScreenHeight = 1024;
 u8 gameRunning = 1; // game loop
 mat4 matProj;
 u32 last_frame_time = 0;
@@ -26,21 +26,13 @@ void process_input() {
       gameRunning = 0;
       break;
     case SDLK_z:
+      // rotate_cube_z(cubeMesh);
       break;
     }
   }
 }
 
-int main() {
-
-  ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "SDL_Init failed: %s\n",
-         SDL_GetError());
-
-  ASSERT(IMG_Init(IMG_INIT_PNG), "IMG_Init failed: %s\n", SDL_GetError());
-  ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
-
-  init_cube();
-
+void init_matProj() {
   float fNear = 0.1f;
   float fFar = 1000.0f;
   float fFov = 90.0f;
@@ -53,6 +45,18 @@ int main() {
   matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
   matProj.m[2][3] = 1.0f;
   matProj.m[3][3] = 0.0f;
+}
+
+int main() {
+
+  ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "SDL_Init failed: %s\n",
+         SDL_GetError());
+
+  ASSERT(IMG_Init(IMG_INIT_PNG), "IMG_Init failed: %s\n", SDL_GetError());
+  ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
+
+  init_cube();
+  init_matProj();
 
   triangle *c =
       (triangle *)malloc(sizeof(triangle) * 12); // nouveau cube: 12 tris
