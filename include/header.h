@@ -22,8 +22,6 @@ typedef struct {
   SDL_Renderer *renderer;
 } s_Game;
 
-extern s_Game game;
-
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -41,9 +39,6 @@ typedef struct {
   u8 a;
 } s_Color;
 
-const extern int ScreenWidth;
-const extern int ScreenHeight;
-
 typedef struct {
   double x, y, z;
 } vec3;
@@ -60,13 +55,24 @@ typedef struct {
   float m[4][4];
 } mat4;
 
+/* ********** VARS ************ */
+
+extern u8 gameRunning;
+extern s_Game game;
+const extern int ScreenWidth;
+const extern int ScreenHeight;
 extern triangle cubeMesh[12]; // 12 triangles, 2 par face
-//
+extern mat4 matProj;
+
+/* ********** METHODS ************ */
+
 void init_cube();
 u8 init_window();
 void window_clear();
 void window_display();
+void window_cleanUp();
 void render_triangle(s_Color *colors, triangle *tri);
 void render_rectangle(SDL_Rect *rect, s_Color *colors);
+void update_cube(triangle *c);
 
 #endif

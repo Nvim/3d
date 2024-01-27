@@ -1,4 +1,5 @@
 #include "../include/header.h"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_video.h>
 #include <unistd.h>
@@ -67,5 +68,6 @@ void window_display() { SDL_RenderPresent(game.renderer); }
 void window_cleanUp() {
   SDL_DestroyRenderer(game.renderer);
   SDL_DestroyWindow(game.window);
+  SDL_Quit();
   printf("Cleanup done\n");
 }

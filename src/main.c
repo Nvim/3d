@@ -3,24 +3,31 @@
 
 s_Color cubeColors = {255, 255, 255, 255};
 
-void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
-  o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
-  o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
-  o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
-  float w =
-      i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
-
-  if (w != 0.0f) {
-    o->x /= w;
-    o->y /= w;
-    o->z /= w;
-  }
-}
-
 triangle cubeMesh[12];
 s_Game game;
 const int ScreenWidth = 512;
 const int ScreenHeight = 512;
+u8 gameRunning = 1; // game loop
+mat4 matProj;
+
+void process_input() {
+  SDL_Event event;
+  SDL_PollEvent(&event);
+
+  switch (event.type) {
+  case SDL_QUIT:
+    gameRunning = 0;
+    break;
+  case SDL_KEYDOWN:
+    switch (event.key.keysym.sym) {
+    case SDLK_ESCAPE:
+      gameRunning = 0;
+      break;
+    case SDLK_z:
+      break;
+    }
+  }
+}
 
 int main() {
 
@@ -30,12 +37,9 @@ int main() {
   ASSERT(IMG_Init(IMG_INIT_PNG), "IMG_Init failed: %s\n", SDL_GetError());
   ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
 
-  SDL_Event event;
-  u8 gameRunning = 1; // game loop
-  mat4 matProj;
   float fTheta;
-  double fElapsedTime = 0.0f;
-  clock_t timeStart, timeEnd;
+  // double fElapsedTime = 0.0f;
+  // clock_t timeStart, timeEnd;
   init_cube();
 
   float fNear = 0.1f;
@@ -51,97 +55,30 @@ int main() {
   matProj.m[2][3] = 1.0f;
   matProj.m[3][3] = 0.0f;
 
+  triangle *c =
+      (triangle *)malloc(sizeof(triangle) * 12); // nouveau cube: 12 tris
   /* ******* START LOOP HERE *********** */
 
   window_clear();
   window_display();
   while (gameRunning) {
-    while (SDL_PollEvent(&event)) {
-      timeStart = clock();
-      switch (event.key.keysym.sym) {
-      case SDL_QUIT:
-      case SDLK_ESCAPE:
-        gameRunning = 0;
-        break;
-      default:
-        continue;
-      }
-      // Set up rotation matrices
-      mat4 matRotZ, matRotX;
-      fTheta += 1.0f * fElapsedTime;
+    process_input();
+    update_cube(c);
 
-      // Rotation Z
-      matRotZ.m[0][0] = cosf(fTheta);
-      matRotZ.m[0][1] = sinf(fTheta);
-      matRotZ.m[1][0] = -sinf(fTheta);
-      matRotZ.m[1][1] = cosf(fTheta);
-      matRotZ.m[2][2] = 1;
-      matRotZ.m[3][3] = 1;
-
-      // Rotation X
-      matRotX.m[0][0] = 1;
-      matRotX.m[1][1] = cosf(fTheta * 0.5f);
-      matRotX.m[1][2] = sinf(fTheta * 0.5f);
-      matRotX.m[2][1] = -sinf(fTheta * 0.5f);
-      matRotX.m[2][2] = cosf(fTheta * 0.5f);
-      matRotX.m[3][3] = 1;
-
-      // Draw Triangles
-      // for (auto tri : meshCube.tris) {
-      for (int i = 0; i < 1; i++) {
-        triangle tri = cubeMesh[1];
-        triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
-
-        // Rotate in Z-Axis
-        // MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
-        // MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
-        // MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
-
-        // Rotate in X-Axis
-        // MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0],
-        // &matRotX); MultiplyMatrixVector(&triRotatedZ.p[1],
-        // &triRotatedZX.p[1], &matRotX);
-        // MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2],
-        // &matRotX);
-
-        // Offset into the screen
-        triTranslated = tri;
-        triTranslated.p[0].z = tri.p[0].z + 3.0f;
-        triTranslated.p[1].z = tri.p[1].z + 3.0f;
-        triTranslated.p[2].z = tri.p[2].z + 3.0f;
-
-        // Project triangles from 3D --> 2D
-        MultiplyMatrixVector(&triTranslated.p[0], &triProjected.p[0], &matProj);
-        MultiplyMatrixVector(&triTranslated.p[1], &triProjected.p[1], &matProj);
-        MultiplyMatrixVector(&triTranslated.p[2], &triProjected.p[2], &matProj);
-
-        // Scale into view
-        triProjected.p[0].x += 1.0f;
-        triProjected.p[0].y += 1.0f;
-        triProjected.p[1].x += 1.0f;
-        triProjected.p[1].y += 1.0f;
-        triProjected.p[2].x += 1.0f;
-        triProjected.p[2].y += 1.0f;
-        triProjected.p[0].x *= 0.5f * (float)ScreenWidth;
-        triProjected.p[0].y *= 0.5f * (float)ScreenHeight;
-        triProjected.p[1].x *= 0.5f * (float)ScreenWidth;
-        triProjected.p[1].y *= 0.5f * (float)ScreenHeight;
-        triProjected.p[2].x *= 0.5f * (float)ScreenWidth;
-        triProjected.p[2].y *= 0.5f * (float)ScreenHeight;
-
-        // render triangle:
-        // render_triangle(&cubeColors, &triProjected);
-        SDL_Rect rect;
-        rect.x = 30;
-        rect.y = 30;
-        rect.w = 300;
-        rect.h = 200;
-        render_rectangle(&rect, &cubeColors);
-        window_clear();
-        window_display();
-      }
-      timeEnd = clock();
-      fElapsedTime = ((double)(timeEnd - timeStart)) / (CLOCKS_PER_SEC / 1000);
+    // render triangles:
+    window_clear();
+    for (int i = 0; i < 12; i++) {
+      triangle tri = c[i];
+      render_triangle(&cubeColors, &tri);
     }
+    // SDL_Rect r;
+    // r.x = 20;
+    // r.y = 20;
+    // r.w = 200;
+    // r.h = 350;
+    // render_rectangle(&r, &cubeColors);
+    window_display();
   }
+  window_cleanUp();
+  return EXIT_SUCCESS;
 }
