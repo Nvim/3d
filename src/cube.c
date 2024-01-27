@@ -1,4 +1,5 @@
 #include "../include/header.h"
+#include <SDL2/SDL_timer.h>
 
 void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
   o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
@@ -68,25 +69,37 @@ void init_cube() {
 // updates cubes xyz by multiplying it with matrices:
 void update_cube(triangle *c) {
 
+  // FPS stuff:
+  // sleep until we reach target frametime:
+  i16 time_to_wait = FRAMETIME - (SDL_GetTicks() - last_frame_time);
+  if (time_to_wait > 0 && time_to_wait <= FRAMETIME) {
+    SDL_Delay(time_to_wait);
+  }
+
+  // time between last frame and current frame in seconds:
+  float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
+  last_frame_time = SDL_GetTicks();
+  // printf("Time between frames: %f\n", delta_time);
+
   // Set up rotation matrices
-  // mat4 matRotZ, matRotX;
-  // fTheta += 1.0f * fElapsedTime;
-  //
+  mat4 matRotZ, matRotX;
+  fTheta += 1.0f * delta_time;
+
   // // Rotation Z
-  // matRotZ.m[0][0] = cosf(fTheta);
-  // matRotZ.m[0][1] = sinf(fTheta);
-  // matRotZ.m[1][0] = -sinf(fTheta);
-  // matRotZ.m[1][1] = cosf(fTheta);
-  // matRotZ.m[2][2] = 1;
-  // matRotZ.m[3][3] = 1;
-  //
+  matRotZ.m[0][0] = cosf(fTheta);
+  matRotZ.m[0][1] = sinf(fTheta);
+  matRotZ.m[1][0] = -sinf(fTheta);
+  matRotZ.m[1][1] = cosf(fTheta);
+  matRotZ.m[2][2] = 1;
+  matRotZ.m[3][3] = 1;
+
   // // Rotation X
-  // matRotX.m[0][0] = 1;
-  // matRotX.m[1][1] = cosf(fTheta * 0.5f);
-  // matRotX.m[1][2] = sinf(fTheta * 0.5f);
-  // matRotX.m[2][1] = -sinf(fTheta * 0.5f);
-  // matRotX.m[2][2] = cosf(fTheta * 0.5f);
-  // matRotX.m[3][3] = 1;
+  matRotX.m[0][0] = 1;
+  matRotX.m[1][1] = cosf(fTheta * 0.5f);
+  matRotX.m[1][2] = sinf(fTheta * 0.5f);
+  matRotX.m[2][1] = -sinf(fTheta * 0.5f);
+  matRotX.m[2][2] = cosf(fTheta * 0.5f);
+  matRotX.m[3][3] = 1;
 
   // Draw Triangles
   for (int i = 0; i < 12; i++) {
@@ -94,22 +107,20 @@ void update_cube(triangle *c) {
     triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
 
     // Rotate in Z-Axis
-    // MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
-    // MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
-    // MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
+    MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
+    MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
+    MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
 
     // Rotate in X-Axis
-    // MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0],
-    // &matRotX); MultiplyMatrixVector(&triRotatedZ.p[1],
-    // &triRotatedZX.p[1], &matRotX);
-    // MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2],
-    // &matRotX);
+    MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0], &matRotX);
+    MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
+    MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
 
     // Offset into the screen
-    triTranslated = tri;
-    triTranslated.p[0].z = tri.p[0].z + 3.0f;
-    triTranslated.p[1].z = tri.p[1].z + 3.0f;
-    triTranslated.p[2].z = tri.p[2].z + 3.0f;
+    triTranslated = triRotatedZX;
+    triTranslated.p[0].z = triRotatedZX.p[0].z + 3.0f;
+    triTranslated.p[1].z = triRotatedZX.p[1].z + 3.0f;
+    triTranslated.p[2].z = triRotatedZX.p[2].z + 3.0f;
 
     // Project triangles from 3D --> 2D
     MultiplyMatrixVector(&triTranslated.p[0], &triProjected.p[0], &matProj);

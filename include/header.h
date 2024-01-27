@@ -17,6 +17,9 @@
     exit(1);                                                                   \
   }
 
+#define FPS 10
+#define FRAMETIME (1000 / FPS)
+
 typedef struct {
   SDL_Window *window;
   SDL_Renderer *renderer;
@@ -58,11 +61,13 @@ typedef struct {
 /* ********** VARS ************ */
 
 extern u8 gameRunning;
-extern s_Game game;
+extern u32 last_frame_time;
+extern float fTheta;
 const extern int ScreenWidth;
 const extern int ScreenHeight;
-extern triangle cubeMesh[12]; // 12 triangles, 2 par face
+extern s_Game game;
 extern mat4 matProj;
+extern triangle cubeMesh[12]; // 12 triangles, 2 par face
 
 /* ********** METHODS ************ */
 

@@ -9,6 +9,8 @@ const int ScreenWidth = 512;
 const int ScreenHeight = 512;
 u8 gameRunning = 1; // game loop
 mat4 matProj;
+u32 last_frame_time = 0;
+float fTheta = 0.0f;
 
 void process_input() {
   SDL_Event event;
@@ -37,9 +39,6 @@ int main() {
   ASSERT(IMG_Init(IMG_INIT_PNG), "IMG_Init failed: %s\n", SDL_GetError());
   ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
 
-  float fTheta;
-  // double fElapsedTime = 0.0f;
-  // clock_t timeStart, timeEnd;
   init_cube();
 
   float fNear = 0.1f;
@@ -71,14 +70,9 @@ int main() {
       triangle tri = c[i];
       render_triangle(&cubeColors, &tri);
     }
-    // SDL_Rect r;
-    // r.x = 20;
-    // r.y = 20;
-    // r.w = 200;
-    // r.h = 350;
-    // render_rectangle(&r, &cubeColors);
     window_display();
   }
   window_cleanUp();
+  free(c);
   return EXIT_SUCCESS;
 }
