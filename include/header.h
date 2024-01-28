@@ -17,7 +17,7 @@
     exit(1);                                                                   \
   }
 
-#define FPS 165
+#define FPS 30
 #define FRAMETIME (1000 / FPS)
 
 typedef struct {
@@ -58,6 +58,15 @@ typedef struct {
   float m[4][4];
 } mat4;
 
+typedef struct triStackNode {
+  triangle tri;
+  struct triStackNode *next;
+} triStackNode;
+
+typedef struct {
+  triStackNode *top;
+} triStack;
+
 /* ********** VARS ************ */
 
 extern u8 gameRunning;
@@ -81,8 +90,18 @@ void window_display();
 void window_cleanUp();
 void render_triangle(s_Color *colors, triangle *tri);
 void render_rectangle(SDL_Rect *rect, s_Color *colors);
-void update_cube(triangle *c);
+void update_cube(triStack *stack);
 void rotate_cube_z(triangle *c);
 void rotate_cube_x(triangle *c);
+
+void init_matRotY(mat4 *matRotY);
+void init_matRotX(mat4 *matRotX);
+void init_matRotZ(mat4 *matRotZ);
+void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m);
+
+void init_stack(triStack *stack);
+int stack_empty(triStack *stack);
+void stack_push(triStack *stack, triangle tri);
+triangle stack_pop(triStack *stack);
 
 #endif

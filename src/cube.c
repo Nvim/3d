@@ -1,21 +1,6 @@
 #include "../include/header.h"
 #include <SDL2/SDL_timer.h>
 
-void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
-  float w = 1.0f;
-  o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
-  o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
-  o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
-
-  w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
-
-  if (w != 0.0f) {
-    o->x /= w;
-    o->y /= w;
-    o->z /= w;
-  }
-}
-
 void init_cube() {
 
   cubeMesh[0].p[0] = (vec3){0.0f, 0.0f, 0.0f};
@@ -56,33 +41,6 @@ void init_cube() {
   cubeMesh[11].p[0] = (vec3){1.0f, 0.0f, 1.0f};
   cubeMesh[11].p[1] = (vec3){0.0f, 0.0f, 0.0f};
   cubeMesh[11].p[2] = (vec3){1.0f, 0.0f, 0.0f};
-}
-
-void init_matRotZ(mat4 *matRotZ) {
-  matRotZ->m[0][0] = cosf(fTheta);
-  matRotZ->m[0][1] = sinf(fTheta);
-  matRotZ->m[1][0] = -sinf(fTheta);
-  matRotZ->m[1][1] = cosf(fTheta);
-  matRotZ->m[2][2] = 1;
-  matRotZ->m[3][3] = 1;
-}
-
-void init_matRotX(mat4 *matRotX) {
-  matRotX->m[0][0] = 1;
-  matRotX->m[1][1] = cosf(fTheta * 0.5f);
-  matRotX->m[1][2] = sinf(fTheta * 0.5f);
-  matRotX->m[2][1] = -sinf(fTheta * 0.5f);
-  matRotX->m[2][2] = cosf(fTheta * 0.5f);
-  matRotX->m[3][3] = 1;
-}
-
-void init_matRotY(mat4 *matRotY) {
-  matRotY->m[0][0] = cosf(fTheta);
-  matRotY->m[0][2] = -sinf(fTheta);
-  matRotY->m[1][1] = 1;
-  matRotY->m[2][0] = sinf(fTheta);
-  matRotY->m[2][2] = cosf(fTheta);
-  matRotY->m[3][3] = 1;
 }
 
 void rotate_cube_z(triangle *c) {
@@ -130,7 +88,7 @@ void rotate_cube_x(triangle *c) {
 }
 
 // updates cubes xyz by multiplying it with matrices:
-void update_cube(triangle *c) {
+void update_cube(triStack *stack) {
 
   // FPS stuff:
   // sleep until we reach target frametime:
@@ -194,25 +152,49 @@ void update_cube(triangle *c) {
       triTranslated.p[j].z = tri.p[j].z + 3.0f;
     }
 
-    // Project triangles from 3D --> 2D
-    for (j = 0; j < 3; j++) {
-      MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
+    vec3 normal, line1, line2;
+    line1.x = triTranslated.p[1].x - triTranslated.p[0].x;
+    line1.y = triTranslated.p[1].y - triTranslated.p[0].y;
+    line1.z = triTranslated.p[1].z - triTranslated.p[0].z;
+
+    line2.x = triTranslated.p[2].x - triTranslated.p[0].x;
+    line2.y = triTranslated.p[2].y - triTranslated.p[0].y;
+    line2.z = triTranslated.p[2].z - triTranslated.p[0].z;
+
+    normal.x = line1.y * line2.z - line1.z * line2.y;
+    normal.y = line1.z * line2.x - line1.x * line2.z;
+    normal.z = line1.x * line2.y - line1.y * line2.x;
+
+    // normalize the normal
+    float len =
+        sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+    normal.x /= len;
+    normal.y /= len;
+    normal.z /= len;
+
+    if (normal.z < 0) {
+
+      //  Project triangles from 3D --> 2D
+      for (j = 0; j < 3; j++) {
+        MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
+      }
+
+      // Scale into view
+      triProjected.p[0].x += 0.8f;
+      triProjected.p[0].y += 0.8f;
+      triProjected.p[1].x += 0.8f;
+      triProjected.p[1].y += 0.8f;
+      triProjected.p[2].x += 0.8f;
+      triProjected.p[2].y += 0.8f;
+      triProjected.p[0].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[0].y *= 0.4f * (float)ScreenHeight;
+      triProjected.p[1].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[1].y *= 0.4f * (float)ScreenHeight;
+      triProjected.p[2].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[2].y *= 0.4f * (float)ScreenHeight;
+
+      // c[i] = triProjected;
+      stack_push(stack, triProjected);
     }
-
-    // Scale into view
-    triProjected.p[0].x += 1.0f;
-    triProjected.p[0].y += 1.0f;
-    triProjected.p[1].x += 1.0f;
-    triProjected.p[1].y += 1.0f;
-    triProjected.p[2].x += 1.0f;
-    triProjected.p[2].y += 1.0f;
-    triProjected.p[0].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[0].y *= 0.4f * (float)ScreenHeight;
-    triProjected.p[1].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[1].y *= 0.4f * (float)ScreenHeight;
-    triProjected.p[2].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[2].y *= 0.4f * (float)ScreenHeight;
-
-    c[i] = triProjected;
   }
 }
