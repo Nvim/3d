@@ -1,16 +1,24 @@
 #include "../include/header.h"
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_render.h>
+#include <stdlib.h>
 #include <time.h>
 
 s_Color cubeColors = {255, 255, 255, 255};
+s_Color red = {255, 0, 0, 255};
+s_Color black = {0, 0, 0, 255};
 
 triangle cubeMesh[12];
 s_Game game;
-const int ScreenWidth = 1024;
-const int ScreenHeight = 1024;
+const int ScreenWidth = 512;
+const int ScreenHeight = 512;
 u8 gameRunning = 1; // game loop
 mat4 matProj;
 u32 last_frame_time = 0;
 float fTheta = 0.0f;
+u8 rotateX = 0;
+u8 rotateY = 0;
+u8 rotateZ = 0;
 
 void process_input() {
   SDL_Event event;
@@ -25,8 +33,26 @@ void process_input() {
     case SDLK_ESCAPE:
       gameRunning = 0;
       break;
-    case SDLK_z:
-      // rotate_cube_z(cubeMesh);
+    case SDLK_DOWN:
+      if (rotateZ == 0) {
+        rotateZ = 1;
+      } else {
+        rotateZ = 0;
+      }
+      break;
+    case SDLK_UP:
+      if (rotateX == 0) {
+        rotateX = 1;
+      } else {
+        rotateX = 0;
+      }
+      break;
+    case SDLK_LEFT:
+      if (rotateY == 0) {
+        rotateY = 1;
+      } else {
+        rotateY = 0;
+      }
       break;
     }
   }
@@ -49,6 +75,7 @@ void init_matProj() {
 
 int main() {
 
+  srand(time(NULL));
   ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "SDL_Init failed: %s\n",
          SDL_GetError());
 
@@ -58,8 +85,17 @@ int main() {
   init_cube();
   init_matProj();
 
+  SDL_Color colors[12];
+  for (int i = 0; i < 12; i += 2) {
+    colors[i] = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
+    colors[i + 1] = colors[i];
+  }
+
   triangle *c =
       (triangle *)malloc(sizeof(triangle) * 12); // nouveau cube: 12 tris
+
+  SDL_Vertex vertices[3];
+
   /* ******* START LOOP HERE *********** */
 
   window_clear();
@@ -70,9 +106,24 @@ int main() {
 
     // render triangles:
     window_clear();
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 12; i++) { // foreach triangle
       triangle tri = c[i];
-      render_triangle(&cubeColors, &tri);
+      // if (i == 5 || i == 6) {
+      //   printf("Tri #%d XYZ: {(%f, %f, %f), (%f, %f, %f), (%f, %f, %f)}\n",
+      //   i,
+      //          tri.p[0].x, tri.p[0].y, tri.p[0].z, tri.p[1].x, tri.p[1].y,
+      //          tri.p[1].z, tri.p[2].x, tri.p[2].y, tri.p[2].z);
+      // }
+      for (int j = 0; j < 3; j++) { // foreach point of the tri
+        SDL_FPoint p = {tri.p[j].x, tri.p[j].y};
+        SDL_Vertex v = {p, colors[i], (SDL_FPoint){1, 1}};
+        // if (i == 7 || i == 6) {
+        //   v.color = (SDL_Color){255, 0, 0, 255};
+        // }
+        vertices[j] = v;
+      }
+      render_triangle(&black, &tri);
+      SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
     }
     window_display();
   }

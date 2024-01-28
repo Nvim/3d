@@ -18,31 +18,25 @@ void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
 
 void init_cube() {
 
-  // South:
   cubeMesh[0].p[0] = (vec3){0.0f, 0.0f, 0.0f};
   cubeMesh[0].p[1] = (vec3){0.0f, 1.0f, 0.0f};
   cubeMesh[0].p[2] = (vec3){1.0f, 1.0f, 0.0f};
   cubeMesh[1].p[0] = (vec3){0.0f, 0.0f, 0.0f};
   cubeMesh[1].p[1] = (vec3){1.0f, 1.0f, 0.0f};
   cubeMesh[1].p[2] = (vec3){1.0f, 0.0f, 0.0f};
-
-  // East:
   cubeMesh[2].p[0] = (vec3){1.0f, 0.0f, 0.0f};
   cubeMesh[2].p[1] = (vec3){1.0f, 1.0f, 0.0f};
   cubeMesh[2].p[2] = (vec3){1.0f, 1.0f, 1.0f};
   cubeMesh[3].p[0] = (vec3){1.0f, 0.0f, 0.0f};
   cubeMesh[3].p[1] = (vec3){1.0f, 1.0f, 1.0f};
   cubeMesh[3].p[2] = (vec3){1.0f, 0.0f, 1.0f};
-
-  // North
   cubeMesh[4].p[0] = (vec3){1.0f, 0.0f, 1.0f};
-  cubeMesh[4].p[1] = (vec3){1.0f, 0.0f, 1.0f};
-  cubeMesh[4].p[2] = (vec3){1.0f, 1.0f, 1.0f};
+  cubeMesh[4].p[1] = (vec3){1.0f, 1.0f, 1.0f};
+  cubeMesh[4].p[2] = (vec3){0.0f, 1.0f, 1.0f};
   cubeMesh[5].p[0] = (vec3){1.0f, 0.0f, 1.0f};
   cubeMesh[5].p[1] = (vec3){0.0f, 1.0f, 1.0f};
   cubeMesh[5].p[2] = (vec3){0.0f, 0.0f, 1.0f};
 
-  // West:
   cubeMesh[6].p[0] = (vec3){0.0f, 0.0f, 1.0f};
   cubeMesh[6].p[1] = (vec3){0.0f, 1.0f, 1.0f};
   cubeMesh[6].p[2] = (vec3){0.0f, 1.0f, 0.0f};
@@ -50,20 +44,17 @@ void init_cube() {
   cubeMesh[7].p[1] = (vec3){0.0f, 1.0f, 0.0f};
   cubeMesh[7].p[2] = (vec3){0.0f, 0.0f, 0.0f};
 
-  // Top:
   cubeMesh[8].p[0] = (vec3){0.0f, 1.0f, 0.0f};
   cubeMesh[8].p[1] = (vec3){0.0f, 1.0f, 1.0f};
   cubeMesh[8].p[2] = (vec3){1.0f, 1.0f, 1.0f};
   cubeMesh[9].p[0] = (vec3){0.0f, 1.0f, 0.0f};
   cubeMesh[9].p[1] = (vec3){1.0f, 1.0f, 1.0f};
   cubeMesh[9].p[2] = (vec3){1.0f, 1.0f, 0.0f};
-
-  // Bottom:
   cubeMesh[10].p[0] = (vec3){1.0f, 0.0f, 1.0f};
-  cubeMesh[10].p[2] = (vec3){0.0f, 0.0f, 1.0f};
+  cubeMesh[10].p[1] = (vec3){0.0f, 0.0f, 1.0f};
   cubeMesh[10].p[2] = (vec3){0.0f, 0.0f, 0.0f};
   cubeMesh[11].p[0] = (vec3){1.0f, 0.0f, 1.0f};
-  cubeMesh[11].p[2] = (vec3){0.0f, 0.0f, 0.0f};
+  cubeMesh[11].p[1] = (vec3){0.0f, 0.0f, 0.0f};
   cubeMesh[11].p[2] = (vec3){1.0f, 0.0f, 0.0f};
 }
 
@@ -83,6 +74,15 @@ void init_matRotX(mat4 *matRotX) {
   matRotX->m[2][1] = -sinf(fTheta * 0.5f);
   matRotX->m[2][2] = cosf(fTheta * 0.5f);
   matRotX->m[3][3] = 1;
+}
+
+void init_matRotY(mat4 *matRotY) {
+  matRotY->m[0][0] = cosf(fTheta);
+  matRotY->m[0][2] = -sinf(fTheta);
+  matRotY->m[1][1] = 1;
+  matRotY->m[2][0] = sinf(fTheta);
+  matRotY->m[2][2] = cosf(fTheta);
+  matRotY->m[3][3] = 1;
 }
 
 void rotate_cube_z(triangle *c) {
@@ -145,41 +145,57 @@ void update_cube(triangle *c) {
   // printf("Time between frames: %f\n", delta_time);
 
   // Set up rotation matrices
-  mat4 matRotZ, matRotX;
+  mat4 matRotZ, matRotX, matRotY;
   u8 i, j;
   fTheta += 1.0f * delta_time;
   for (i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       matRotX.m[i][j] = 0;
       matRotZ.m[i][j] = 0;
+      matRotY.m[i][j] = 0;
     }
   }
   init_matRotX(&matRotX);
   init_matRotZ(&matRotZ);
-  triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
+  init_matRotY(&matRotY);
+  triangle triProjected, triTranslated, triRotatedX, triRotatedZ, triRotatedY;
 
   // Draw Triangles
   for (i = 0; i < 12; i++) {
     triangle tri = cubeMesh[i];
 
-    // Rotate in Z-Axis
-    for (j = 0; j < 4; j++) {
-      MultiplyMatrixVector(&tri.p[j], &triRotatedZ.p[j], &matRotZ);
+    // x rotation:
+    if (rotateX == 1) {
+      for (j = 0; j < 3; j++) {
+        MultiplyMatrixVector(&tri.p[j], &triRotatedX.p[j], &matRotX);
+      }
+      tri = triRotatedX;
     }
 
-    // Rotate in X-Axis
-    for (j = 0; j < 4; j++) {
-      MultiplyMatrixVector(&triRotatedZ.p[j], &triRotatedZX.p[j], &matRotX);
+    // z rotation:
+    if (rotateZ == 1) {
+      for (j = 0; j < 3; j++) {
+        MultiplyMatrixVector(&tri.p[j], &triRotatedZ.p[j], &matRotZ);
+      }
+      tri = triRotatedZ;
+    }
+
+    // y rotation:
+    if (rotateY == 1) {
+      for (j = 0; j < 3; j++) {
+        MultiplyMatrixVector(&tri.p[j], &triRotatedY.p[j], &matRotY);
+      }
+      tri = triRotatedY;
     }
 
     // Offset into the screen
-    triTranslated = triRotatedZX;
-    for (j = 0; j < 4; j++) {
-      triTranslated.p[j].z = triRotatedZX.p[j].z + 3.0f;
+    triTranslated = tri;
+    for (j = 0; j < 3; j++) {
+      triTranslated.p[j].z = tri.p[j].z + 3.0f;
     }
 
     // Project triangles from 3D --> 2D
-    for (j = 0; j < 4; j++) {
+    for (j = 0; j < 3; j++) {
       MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
     }
 

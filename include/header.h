@@ -17,7 +17,7 @@
     exit(1);                                                                   \
   }
 
-#define FPS 60
+#define FPS 165
 #define FRAMETIME (1000 / FPS)
 
 typedef struct {
@@ -63,6 +63,9 @@ typedef struct {
 extern u8 gameRunning;
 extern u32 last_frame_time;
 extern float fTheta;
+extern u8 rotateX;
+extern u8 rotateZ;
+extern u8 rotateY;
 const extern int ScreenWidth;
 const extern int ScreenHeight;
 extern s_Game game;
