@@ -10,6 +10,8 @@ s_Color red = {255, 0, 0, 255};
 s_Color black = {0, 0, 0, 255};
 
 triangle cubeMesh[12];
+vec3 vCamera = {0.0f, 0.0f, 0.0f};
+vec3 light_direction = {0.0f, 0.0f, -1.0f};
 s_Game game;
 const int ScreenWidth = 512;
 const int ScreenHeight = 512;
@@ -87,12 +89,13 @@ int main() {
   init_cube();
   init_matProj();
 
-  SDL_Color colors[12];
-  for (i = 0; i < 12; i += 2) {
-    colors[i] = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
-    colors[i + 1] = colors[i];
-  }
+  // SDL_Color colors[12];
+  // for (i = 0; i < 12; i += 2) {
+  //   colors[i] = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
+  //   colors[i + 1] = colors[i];
+  // }
 
+  SDL_Color cols = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
   triStack trisToRender;
   init_stack(&trisToRender);
   SDL_Vertex vertices[3];
@@ -110,12 +113,16 @@ int main() {
     i = 0;
     while (!stack_empty(&trisToRender)) { // foreach triangle
       triangle tri = stack_pop(&trisToRender);
+      SDL_Color tmpCol = cols;
+      tmpCol.r *= tri.light;
+      tmpCol.g *= tri.light;
+      tmpCol.b *= tri.light;
       for (int j = 0; j < 3; j++) { // foreach point of the tri
         SDL_FPoint p = {tri.p[j].x, tri.p[j].y};
-        SDL_Vertex v = {p, colors[i], (SDL_FPoint){1, 1}};
+        SDL_Vertex v = {p, tmpCol, (SDL_FPoint){1, 1}};
         vertices[j] = v;
       }
-      render_triangle(&cubeColors, &tri);
+      // render_triangle(&cubeColors, &tri);
       SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
       i++;
     }

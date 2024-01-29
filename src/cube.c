@@ -172,14 +172,32 @@ void update_cube(triStack *stack) {
     normal.y /= len;
     normal.z /= len;
 
-    if (normal.z < 0) {
+    // rasterize only visible triangles:
+    // if (normal.z < 0) {
+    if (normal.x * (triTranslated.p[0].x - vCamera.x) +
+            normal.y * (triTranslated.p[0].y - vCamera.y) +
+            normal.z * (triTranslated.p[0].z - vCamera.z) <
+        0) {
+
+      // calculate luminescence:
+      float l = sqrtf(light_direction.x * light_direction.x +
+                      light_direction.y * light_direction.y +
+                      light_direction.z * light_direction.z);
+      light_direction.x /= l;
+      light_direction.y /= l;
+      light_direction.z /= l;
+
+      float dp = normal.x * light_direction.x + normal.y * light_direction.y +
+                 normal.z * light_direction.z;
 
       //  Project triangles from 3D --> 2D
       for (j = 0; j < 3; j++) {
         MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
       }
 
-      // Scale into view
+      // Apply light level and scale into view
+      triProjected.light = dp;
+      // printf("DP: %f\n", dp);
       triProjected.p[0].x += 0.8f;
       triProjected.p[0].y += 0.8f;
       triProjected.p[1].x += 0.8f;

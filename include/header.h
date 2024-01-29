@@ -52,6 +52,7 @@ typedef struct {
 
 typedef struct {
   vec3 p[3];
+  float light; // between 0 and 1
 } triangle;
 
 typedef struct {
@@ -80,6 +81,8 @@ const extern int ScreenHeight;
 extern s_Game game;
 extern mat4 matProj;
 extern triangle cubeMesh[12]; // 12 triangles, 2 par face
+extern vec3 vCamera;
+extern vec3 light_direction;
 
 /* ********** METHODS ************ */
 

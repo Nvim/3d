@@ -8,17 +8,13 @@ void stack_push(triStack *stack, triangle tri) {
   // Allouer la mémoire pour un nouvel élément
   triStackNode *new = (triStackNode *)malloc(sizeof(triStackNode));
 
-  // Vérifier si l'allocation a réussi
   if (new == NULL) {
     fprintf(stderr, "Erreur d'allocation de mémoire\n");
     exit(EXIT_FAILURE);
   }
 
-  // Assigner la valeur et mettre à jour le pointeur next
   new->tri = tri;
   new->next = stack->top;
-
-  // Mettre à jour le pointeur top de la pile
   stack->top = new;
 }
 
