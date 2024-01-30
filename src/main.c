@@ -9,12 +9,15 @@ s_Color cubeColors = {255, 255, 255, 255};
 s_Color red = {255, 0, 0, 255};
 s_Color black = {0, 0, 0, 255};
 
-triangle cubeMesh[12];
+// triangle cubeMesh[12];
+// triStack mesh;
+triangle *mesh = NULL;
+u32 meshSize = 0;
 vec3 vCamera = {0.0f, 0.0f, 0.0f};
 vec3 light_direction = {0.0f, 0.0f, -1.0f};
 s_Game game;
-const int ScreenWidth = 512;
-const int ScreenHeight = 512;
+const int ScreenWidth = 1024;
+const int ScreenHeight = 1024;
 u8 gameRunning = 1; // game loop
 mat4 matProj;
 u32 last_frame_time = 0;
@@ -78,7 +81,6 @@ void init_matProj() {
 
 int main() {
 
-  srand(time(NULL));
   ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "SDL_Init failed: %s\n",
          SDL_GetError());
 
@@ -86,8 +88,22 @@ int main() {
   ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
 
   u8 i;
-  init_cube();
+  // init_stack(&mesh);
+  // init_cube();
+  u8 loaded = 0;
+  loaded = load_obj();
+  if (loaded == 0) {
+    fprintf(stderr, "LOADED == 0\n");
+    window_cleanUp();
+    return EXIT_FAILURE;
+  }
+  if (&mesh[0] == NULL) {
+    fprintf(stderr, "Mesh empty.\n");
+    window_cleanUp();
+    return EXIT_FAILURE;
+  }
   init_matProj();
+  srand(time(NULL));
 
   // SDL_Color colors[12];
   // for (i = 0; i < 12; i += 2) {
@@ -112,6 +128,7 @@ int main() {
     window_clear();
     i = 0;
     while (!stack_empty(&trisToRender)) { // foreach triangle
+      // printf("%d\n", i);
       triangle tri = stack_pop(&trisToRender);
       SDL_Color tmpCol = cols;
       tmpCol.r *= tri.light;
@@ -119,7 +136,7 @@ int main() {
       tmpCol.b *= tri.light;
       for (int j = 0; j < 3; j++) { // foreach point of the tri
         SDL_FPoint p = {tri.p[j].x, tri.p[j].y};
-        SDL_Vertex v = {p, tmpCol, (SDL_FPoint){1, 1}};
+        SDL_Vertex v = {p, cols, (SDL_FPoint){1, 1}};
         vertices[j] = v;
       }
       // render_triangle(&cubeColors, &tri);
@@ -129,5 +146,6 @@ int main() {
     window_display();
   }
   window_cleanUp();
+  free(mesh);
   return EXIT_SUCCESS;
 }

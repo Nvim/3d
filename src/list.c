@@ -1,6 +1,9 @@
 #include "../include/header.h"
 
-void init_stack(triStack *stack) { stack->top = NULL; }
+void init_stack(triStack *stack) {
+  stack->top = NULL;
+  stack->count = 0;
+}
 
 int stack_empty(triStack *stack) { return (stack->top == NULL); }
 
@@ -16,6 +19,7 @@ void stack_push(triStack *stack, triangle tri) {
   new->tri = tri;
   new->next = stack->top;
   stack->top = new;
+  stack->count++;
 }
 
 triangle stack_pop(triStack *stack) {
@@ -30,10 +34,22 @@ triangle stack_pop(triStack *stack) {
   // Mettre à jour le pointeur top pour pointer vers le prochain élément
   triStackNode *temp = stack->top;
   stack->top = stack->top->next;
+  stack->count--;
 
   // Libérer la mémoire de l'ancien élément
   free(temp);
 
   // Retourner le triangle retiré
   return t;
+}
+
+// peek top
+triangle stack_peek(triStack *stack) {
+  if (stack_empty(stack)) {
+    fprintf(stderr, "La pile est vide\n");
+    exit(EXIT_FAILURE);
+  }
+
+  // Retourner le triangle en haut de la pile
+  return stack->top->tri;
 }

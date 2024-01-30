@@ -65,6 +65,7 @@ typedef struct triStackNode {
 } triStackNode;
 
 typedef struct {
+  u32 count;
   triStackNode *top;
 } triStack;
 
@@ -76,11 +77,14 @@ extern float fTheta;
 extern u8 rotateX;
 extern u8 rotateZ;
 extern u8 rotateY;
+extern u32 meshSize;
 const extern int ScreenWidth;
 const extern int ScreenHeight;
 extern s_Game game;
 extern mat4 matProj;
-extern triangle cubeMesh[12]; // 12 triangles, 2 par face
+// extern triangle cubeMesh[12]; // 12 triangles, 2 par face
+// extern triStack mesh;
+extern triangle *mesh;
 extern vec3 vCamera;
 extern vec3 light_direction;
 
@@ -106,5 +110,7 @@ void init_stack(triStack *stack);
 int stack_empty(triStack *stack);
 void stack_push(triStack *stack, triangle tri);
 triangle stack_pop(triStack *stack);
+triangle stack_peek(triStack *stack);
+u8 load_obj();
 
 #endif
