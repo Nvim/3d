@@ -7,7 +7,7 @@
 // f = face
 // faces use multiple time the same vertex
 u8 load_obj() {
-  FILE *fp = fopen("models/ship.obj", "r");
+  FILE *fp = fopen("models/cube.obj", "r");
   if (fp == NULL) {
     fprintf(stderr, "FP NULL\n");
     return 0;

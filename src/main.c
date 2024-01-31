@@ -136,13 +136,14 @@ int main() {
       tmpCol.b *= tri.light;
       for (int j = 0; j < 3; j++) { // foreach point of the tri
         SDL_FPoint p = {tri.p[j].x, tri.p[j].y};
-        SDL_Vertex v = {p, cols, (SDL_FPoint){1, 1}};
+        SDL_Vertex v = {p, tmpCol, (SDL_FPoint){1, 1}};
         vertices[j] = v;
       }
       // render_triangle(&cubeColors, &tri);
       SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
       i++;
     }
+    // printf("Rendered %d triangles\n", i);
     window_display();
   }
   window_cleanUp();

@@ -120,6 +120,7 @@ void update_cube(triStack *stack) {
 
   // Draw Triangles
   i = 0;
+  // printf("Processing %d triangles...\n", meshSize);
   for (i = 0; i < meshSize; i++) {
     // while (!stack_empty(&mesh)) { // foreach triangle
     // triangle tri = stack_peek(&mesh);
@@ -177,46 +178,47 @@ void update_cube(triStack *stack) {
 
     // rasterize only visible triangles:
     // if (normal.z < 0) {
-    // if (normal.x * (triTranslated.p[0].x - vCamera.x) +
-    //         normal.y * (triTranslated.p[0].y - vCamera.y) +
-    //         normal.z * (triTranslated.p[0].z - vCamera.z) <
-    //     0) {
+    if (normal.x * (triTranslated.p[0].x - vCamera.x) +
+            normal.y * (triTranslated.p[0].y - vCamera.y) +
+            normal.z * (triTranslated.p[0].z - vCamera.z) <
+        0) {
 
-    // calculate luminescence:
-    float l = sqrtf(light_direction.x * light_direction.x +
-                    light_direction.y * light_direction.y +
-                    light_direction.z * light_direction.z);
-    light_direction.x /= l;
-    light_direction.y /= l;
-    light_direction.z /= l;
+      // calculate luminescence:
+      float l = sqrtf(light_direction.x * light_direction.x +
+                      light_direction.y * light_direction.y +
+                      light_direction.z * light_direction.z);
+      light_direction.x /= l;
+      light_direction.y /= l;
+      light_direction.z /= l;
 
-    float dp = normal.x * light_direction.x + normal.y * light_direction.y +
-               normal.z * light_direction.z;
+      float dp = normal.x * light_direction.x + normal.y * light_direction.y +
+                 normal.z * light_direction.z;
 
-    //  Project triangles from 3D --> 2D
-    for (j = 0; j < 3; j++) {
-      MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
+      //  Project triangles from 3D --> 2D
+      for (j = 0; j < 3; j++) {
+        MultiplyMatrixVector(&triTranslated.p[j], &triProjected.p[j], &matProj);
+      }
+
+      // Apply light level and scale into view
+      triProjected.light = dp;
+      // printf("DP: %f\n", dp);
+      triProjected.p[0].x += 0.8f;
+      triProjected.p[0].y += 0.8f;
+      triProjected.p[1].x += 0.8f;
+      triProjected.p[1].y += 0.8f;
+      triProjected.p[2].x += 0.8f;
+      triProjected.p[2].y += 0.8f;
+      triProjected.p[0].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[0].y *= 0.4f * (float)ScreenHeight;
+      triProjected.p[1].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[1].y *= 0.4f * (float)ScreenHeight;
+      triProjected.p[2].x *= 0.4f * (float)ScreenWidth;
+      triProjected.p[2].y *= 0.4f * (float)ScreenHeight;
+
+      // c[i] = triProjected;
+      stack_push(stack, triProjected);
     }
-
-    // Apply light level and scale into view
-    triProjected.light = dp;
-    // printf("DP: %f\n", dp);
-    triProjected.p[0].x += 0.8f;
-    triProjected.p[0].y += 0.8f;
-    triProjected.p[1].x += 0.8f;
-    triProjected.p[1].y += 0.8f;
-    triProjected.p[2].x += 0.8f;
-    triProjected.p[2].y += 0.8f;
-    triProjected.p[0].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[0].y *= 0.4f * (float)ScreenHeight;
-    triProjected.p[1].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[1].y *= 0.4f * (float)ScreenHeight;
-    triProjected.p[2].x *= 0.4f * (float)ScreenWidth;
-    triProjected.p[2].y *= 0.4f * (float)ScreenHeight;
-
-    // c[i] = triProjected;
-    stack_push(stack, triProjected);
-    i++;
+    // printf("* Processed %d triangles, stack now has %d elements\n", i,
+    // stack->count);
   }
 }
-// }
