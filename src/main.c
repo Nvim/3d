@@ -14,12 +14,12 @@ s_Color black = {0, 0, 0, 255};
 triangle *mesh = NULL;
 u32 meshSize = 0;
 vec3 vCamera = {0.0f, 0.0f, 0.0f};
-vec3 light_direction = {0.0f, 0.0f, -1.0f};
+vec3 light_direction = {0.0f, 0.0f, -1.0f, 1};
 s_Game game;
 const int ScreenWidth = 1024;
 const int ScreenHeight = 1024;
 u8 gameRunning = 1; // game loop
-mat4 matProj;
+// mat4 matProj;
 u32 last_frame_time = 0;
 float fTheta = 0.0f;
 u8 rotateX = 0;
@@ -64,20 +64,20 @@ void process_input() {
   }
 }
 
-void init_matProj() {
-  float fNear = 0.1f;
-  float fFar = 1000.0f;
-  float fFov = 90.0f;
-  float fAspectRatio = (float)ScreenHeight / (float)ScreenWidth;
-  float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-
-  matProj.m[0][0] = fAspectRatio * fFovRad;
-  matProj.m[1][1] = fFovRad;
-  matProj.m[2][2] = fFar / (fFar - fNear);
-  matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
-  matProj.m[2][3] = 1.0f;
-  matProj.m[3][3] = 0.0f;
-}
+// void init_matProj() {
+//   float fNear = 0.1f;
+//   float fFar = 1000.0f;
+//   float fFov = 90.0f;
+//   float fAspectRatio = (float)ScreenHeight / (float)ScreenWidth;
+//   float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+//
+//   matProj.m[0][0] = fAspectRatio * fFovRad;
+//   matProj.m[1][1] = fFovRad;
+//   matProj.m[2][2] = fFar / (fFar - fNear);
+//   matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+//   matProj.m[2][3] = 1.0f;
+//   matProj.m[3][3] = 0.0f;
+// }
 
 int main() {
 
@@ -88,8 +88,6 @@ int main() {
   ASSERT(init_window() == EXIT_SUCCESS, "Window Init failed.\n");
 
   u8 i;
-  // init_stack(&mesh);
-  // init_cube();
   u8 loaded = 0;
   loaded = load_obj();
   if (loaded == 0) {
@@ -102,7 +100,6 @@ int main() {
     window_cleanUp();
     return EXIT_FAILURE;
   }
-  init_matProj();
   srand(time(NULL));
 
   // SDL_Color colors[12];
@@ -128,7 +125,6 @@ int main() {
     window_clear();
     i = 0;
     while (!stack_empty(&trisToRender)) { // foreach triangle
-      // printf("%d\n", i);
       triangle tri = stack_pop(&trisToRender);
       SDL_Color tmpCol = cols;
       tmpCol.r *= tri.light;
@@ -139,8 +135,8 @@ int main() {
         SDL_Vertex v = {p, tmpCol, (SDL_FPoint){1, 1}};
         vertices[j] = v;
       }
-      // render_triangle(&cubeColors, &tri);
-      SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
+      render_triangle(&cubeColors, &tri);
+      // SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
       i++;
     }
     // printf("Rendered %d triangles\n", i);
