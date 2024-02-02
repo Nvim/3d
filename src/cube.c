@@ -104,4 +104,5 @@ void update_cube(triStack *stack) {
       stack_push(stack, triProjected);
     }
   }
+  printf("Stack Full, %d triangles\n", stack->count);
 }
