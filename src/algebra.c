@@ -16,7 +16,7 @@ void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
 }
 
 vec3 Matrix_MultiplyVector(mat4 *m, vec3 *i) {
-  vec3 v;
+  vec3 v = {0.0f, 0.0f, 0.0f, 1.0f};
   v.x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] +
         i->w * m->m[3][0];
   v.y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] +

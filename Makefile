@@ -49,6 +49,7 @@ $(RELEASE_BIN): $(OBJS)
 #	~1ere COMMANDE: 
 #Création des fichiers objets à partir des fichiers.c du dossier ./src (compiling)
 $(OBJ)/%.o: $(SRC)/%.c 
+	mkdir -p obj bin bin/release bin/debug
 	$(CXX) -c $< $(COMPILE_FLAGS) -o $@ 	
 #equivaut à: g++ -c src/fichier1.cpp src/fichier2.cpp src/fichier3.cpp -o obj/fichier1.o obj/fichier2.o obj/fichier3.o
 

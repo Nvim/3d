@@ -17,7 +17,7 @@
     exit(1);                                                                   \
   }
 
-#define FPS 30
+#define FPS 60
 #define FRAMETIME (1000 / FPS)
 
 typedef struct {
@@ -100,6 +100,7 @@ void render_rectangle(SDL_Rect *rect, s_Color *colors);
 void update_cube(triStack *stack);
 void rotate_cube_z(triangle *c);
 void rotate_cube_x(triangle *c);
+void wait_frame();
 
 void init_matRotY(mat4 *matRotY);
 void init_matRotX(mat4 *matRotX);

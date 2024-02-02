@@ -119,6 +119,7 @@ int main() {
   window_display();
   while (gameRunning) {
     process_input();
+    wait_frame();               // wait to display next frame
     update_cube(&trisToRender); // fills the stack
 
     // render triangles:
@@ -135,7 +136,7 @@ int main() {
         SDL_Vertex v = {p, tmpCol, (SDL_FPoint){1, 1}};
         vertices[j] = v;
       }
-      render_triangle(&cubeColors, &tri);
+      // render_triangle(&cubeColors, &tri);
       SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
       i++;
     }
