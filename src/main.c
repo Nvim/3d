@@ -136,7 +136,7 @@ int main() {
         vertices[j] = v;
       }
       render_triangle(&cubeColors, &tri);
-      // SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
+      SDL_RenderGeometry(game.renderer, NULL, vertices, 3, NULL, 0);
       i++;
     }
     // printf("Rendered %d triangles\n", i);

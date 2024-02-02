@@ -24,20 +24,13 @@ void update_cube(triStack *stack) {
 
   u8 i, j;
   fTheta += 1.2f * delta_time;
-  for (i = 0; i < 4; i++) {
-    for (int j = 0; j < 4; j++) {
-      matRotX.m[i][j] = 0;
-      matRotZ.m[i][j] = 0;
-      matRotY.m[i][j] = 0;
-    }
-  }
   matRotZ = Matrix_MakeRotationZ(fTheta);
   matRotX = Matrix_MakeRotationX(fTheta);
   matRotY = Matrix_MakeRotationY(fTheta);
   mat4 matTrans; // to offset the object back into the screen (hide clipping)
   mat4 matWorld; // product of all transformations
 
-  matTrans = Matrix_MakeTranslation(0.0f, 0.0f, 16.0f);
+  matTrans = Matrix_MakeTranslation(0.0f, 0.0f, 4.0f);
 
   matWorld = Matrix_MakeIdentity();
   matWorld = Matrix_MultiplyMatrix(&matRotZ, &matRotX);   // rotate 1st
@@ -49,20 +42,20 @@ void update_cube(triStack *stack) {
   i = 0;
   for (i = 0; i < meshSize; i++) {
     triangle tri = mesh[i];
-    // tri.p[0].w = 1;
-    // tri.p[1].w = 1;
-    // tri.p[2].w = 1;
-    // triTransformed.p[0].w = 1;
-    // triTransformed.p[1].w = 1;
-    // triTransformed.p[2].w = 1;
-    // triProjected.p[0].w = 1;
-    // triProjected.p[1].w = 1;
-    // triProjected.p[2].w = 1;
-    for (int j = 0; j < 3; j++) {
-      tri.p[j].w = 1;
-      triProjected.p[j].w = 1;
-      triTransformed.p[j].w = 1;
-    }
+    tri.p[0].w = 1;
+    tri.p[1].w = 1;
+    tri.p[2].w = 1;
+    triTransformed.p[0].w = 1;
+    triTransformed.p[1].w = 1;
+    triTransformed.p[2].w = 1;
+    triProjected.p[0].w = 1;
+    triProjected.p[1].w = 1;
+    triProjected.p[2].w = 1;
+    // for (int j = 0; j < 3; j++) {
+    //   tri.p[j].w = 1;
+    //   triProjected.p[j].w = 1;
+    //   triTransformed.p[j].w = 1;
+    // }
 
     // apply world matrix:
     triTransformed.p[0] = Matrix_MultiplyVector(&matWorld, &tri.p[0]);
@@ -70,16 +63,16 @@ void update_cube(triStack *stack) {
     triTransformed.p[2] = Matrix_MultiplyVector(&matWorld, &tri.p[2]);
 
     // get the triangle's normal vector:
-    vec3 normal, line1, line2;
-    line1 = Vector_Sub(&triTransformed.p[1], &triTransformed.p[0]);
-    line1 = Vector_Sub(&triTransformed.p[2], &triTransformed.p[0]);
-    normal = Vector_CrossProduct(&line1, &line2);
-    normal = Vector_Normalise(&normal);
+    // vec3 normal, line1, line2;
+    // line1 = Vector_Sub(&triTransformed.p[1], &triTransformed.p[0]);
+    // line1 = Vector_Sub(&triTransformed.p[2], &triTransformed.p[0]);
+    // normal = Vector_CrossProduct(&line1, &line2);
+    // normal = Vector_Normalise(&normal);
 
-    vec3 vCameraRay = Vector_Sub(&triTransformed.p[0], &vCamera);
+    // vec3 vCameraRay = Vector_Sub(&triTransformed.p[0], &vCamera);
 
     // rasterize only visible triangles:
-    printf("DP: %f\n", Vector_DotProduct(&normal, &vCameraRay));
+    // printf("DP: %f\n", Vector_DotProduct(&normal, &vCameraRay));
     // if (Vector_DotProduct(&normal, &vCameraRay) < 0.0f) {
     // if (normal.x * (triTransformed.p[0].x - vCamera.x) +
     //         normal.y * (triTransformed.p[0].y - vCamera.y) +
@@ -96,9 +89,9 @@ void update_cube(triStack *stack) {
 
     // min brightness at 0.1:
     // light_direction = Vector_Normalise(&light_direction);
-    float brightness =
-        /* fmax(0.1f, */ Vector_DotProduct(&light_direction, &normal);
-    triProjected.light = brightness;
+    // float brightness =
+    //     fmax(0.1f, Vector_DotProduct(&light_direction, &normal);
+    triProjected.light = 1.0f;
 
     vec3 vOffsetView = {1, 1, 0, 1};
     triProjected.p[0] = Vector_Add(&triProjected.p[0], &vOffsetView);
@@ -113,5 +106,4 @@ void update_cube(triStack *stack) {
 
     stack_push(stack, triProjected);
   }
-}
 }

@@ -28,8 +28,19 @@ vec3 Matrix_MultiplyVector(mat4 *m, vec3 *i) {
   return v;
 }
 
-mat4 Matrix_MakeIdentity() {
+// returns matrix full of 0s
+mat4 Matrix_Init() {
   mat4 matrix;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      matrix.m[i][j] = 0.0f;
+    }
+  }
+  return matrix;
+}
+
+mat4 Matrix_MakeIdentity() {
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = 1.0f;
   matrix.m[1][1] = 1.0f;
   matrix.m[2][2] = 1.0f;
@@ -38,7 +49,7 @@ mat4 Matrix_MakeIdentity() {
 }
 
 mat4 Matrix_MakeRotationX(float fAngleRad) {
-  mat4 matrix;
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = 1.0f;
   matrix.m[1][1] = cosf(fAngleRad);
   matrix.m[1][2] = sinf(fAngleRad);
@@ -49,7 +60,7 @@ mat4 Matrix_MakeRotationX(float fAngleRad) {
 }
 
 mat4 Matrix_MakeRotationY(float fAngleRad) {
-  mat4 matrix;
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = cosf(fAngleRad);
   matrix.m[0][2] = sinf(fAngleRad);
   matrix.m[2][0] = -sinf(fAngleRad);
@@ -60,7 +71,7 @@ mat4 Matrix_MakeRotationY(float fAngleRad) {
 }
 
 mat4 Matrix_MakeRotationZ(float fAngleRad) {
-  mat4 matrix;
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = cosf(fAngleRad);
   matrix.m[0][1] = sinf(fAngleRad);
   matrix.m[1][0] = -sinf(fAngleRad);
@@ -71,7 +82,7 @@ mat4 Matrix_MakeRotationZ(float fAngleRad) {
 }
 
 mat4 Matrix_MakeTranslation(float x, float y, float z) {
-  mat4 matrix;
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = 1.0f;
   matrix.m[1][1] = 1.0f;
   matrix.m[2][2] = 1.0f;
@@ -85,7 +96,7 @@ mat4 Matrix_MakeTranslation(float x, float y, float z) {
 mat4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear,
                            float fFar) {
   float fFovRad = 1.0f / tanf(fFovDegrees * 0.5f / 180.0f * 3.14159f);
-  mat4 matrix;
+  mat4 matrix = Matrix_Init();
   matrix.m[0][0] = fAspectRatio * fFovRad;
   matrix.m[1][1] = fFovRad;
   matrix.m[2][2] = fFar / (fFar - fNear);
