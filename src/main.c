@@ -102,12 +102,6 @@ int main() {
   }
   srand(time(NULL));
 
-  // SDL_Color colors[12];
-  // for (i = 0; i < 12; i += 2) {
-  //   colors[i] = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
-  //   colors[i + 1] = colors[i];
-  // }
-
   SDL_Color cols = (SDL_Color){rand() % 254, rand() % 254, rand() % 254, 255};
   triStack trisToRender;
   init_stack(&trisToRender);

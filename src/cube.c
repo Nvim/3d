@@ -18,9 +18,10 @@ void update_cube(triStack *stack) {
   const float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
   last_frame_time = SDL_GetTicks();
 
-  u8 i, j;
+  u16 i;
+  u8 j;
   // Set up rotation matrices - TODO: less redundant
-  mat4 matTrans = Matrix_MakeTranslation(0.0f, 0.0f, 16.0f);
+  mat4 matTrans = Matrix_MakeTranslation(0.0f, 0.0f, 6.0f);
   mat4 matProj = Matrix_MakeProjection(
       90.0f, (float)ScreenHeight / (float)ScreenWidth, 0.1f, 1000.0f);
 
@@ -104,5 +105,5 @@ void update_cube(triStack *stack) {
       stack_push(stack, triProjected);
     }
   }
-  printf("Stack Full, %d triangles\n", stack->count);
+  // printf("Stack Full, %d triangles\n", stack->count);
 }
