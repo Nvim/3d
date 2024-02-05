@@ -1,21 +1,7 @@
-#include "../include/header.h"
+#include "../include/algebra.h"
+#include <math.h>
 
-void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
-  float w = 1.0f;
-  o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
-  o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
-  o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
-
-  w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
-
-  if (w != 0.0f) {
-    o->x /= w;
-    o->y /= w;
-    o->z /= w;
-  }
-}
-
-vec3 Matrix_MultiplyVector(mat4 *m, vec3 *i) {
+vec3 Matrix_MultiplyVector(const mat4 *m, const vec3 *i) {
   vec3 v = {0.0f, 0.0f, 0.0f, 1.0f};
   v.x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] +
         i->w * m->m[3][0];
@@ -48,7 +34,7 @@ mat4 Matrix_MakeIdentity() {
   return matrix;
 }
 
-mat4 Matrix_MakeRotationX(float fAngleRad) {
+mat4 Matrix_MakeRotationX(const float fAngleRad) {
   mat4 matrix = Matrix_Init();
   matrix.m[0][0] = 1.0f;
   matrix.m[1][1] = cosf(fAngleRad);
@@ -59,7 +45,7 @@ mat4 Matrix_MakeRotationX(float fAngleRad) {
   return matrix;
 }
 
-mat4 Matrix_MakeRotationY(float fAngleRad) {
+mat4 Matrix_MakeRotationY(const float fAngleRad) {
   mat4 matrix = Matrix_Init();
   matrix.m[0][0] = cosf(fAngleRad);
   matrix.m[0][2] = sinf(fAngleRad);
@@ -70,7 +56,7 @@ mat4 Matrix_MakeRotationY(float fAngleRad) {
   return matrix;
 }
 
-mat4 Matrix_MakeRotationZ(float fAngleRad) {
+mat4 Matrix_MakeRotationZ(const float fAngleRad) {
   mat4 matrix = Matrix_Init();
   matrix.m[0][0] = cosf(fAngleRad);
   matrix.m[0][1] = sinf(fAngleRad);
@@ -81,7 +67,7 @@ mat4 Matrix_MakeRotationZ(float fAngleRad) {
   return matrix;
 }
 
-mat4 Matrix_MakeTranslation(float x, float y, float z) {
+mat4 Matrix_MakeTranslation(const float x, const float y, const float z) {
   mat4 matrix = Matrix_Init();
   matrix.m[0][0] = 1.0f;
   matrix.m[1][1] = 1.0f;
@@ -93,8 +79,8 @@ mat4 Matrix_MakeTranslation(float x, float y, float z) {
   return matrix;
 }
 
-mat4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear,
-                           float fFar) {
+mat4 Matrix_MakeProjection(const float fFovDegrees, const float fAspectRatio,
+                           const float fNear, const float fFar) {
   float fFovRad = 1.0f / tanf(fFovDegrees * 0.5f / 180.0f * 3.14159f);
   mat4 matrix = Matrix_Init();
   matrix.m[0][0] = fAspectRatio * fFovRad;
@@ -106,7 +92,7 @@ mat4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear,
   return matrix;
 }
 
-mat4 Matrix_MultiplyMatrix(mat4 *m1, mat4 *m2) {
+mat4 Matrix_MultiplyMatrix(const mat4 *m1, const mat4 *m2) {
   mat4 matrix;
   for (int c = 0; c < 4; c++)
     for (int r = 0; r < 4; r++)
@@ -115,34 +101,34 @@ mat4 Matrix_MultiplyMatrix(mat4 *m1, mat4 *m2) {
   return matrix;
 }
 
-vec3 Vector_Add(vec3 *v1, vec3 *v2) {
+vec3 Vector_Add(const vec3 *v1, const vec3 *v2) {
   return (vec3){v1->x + v2->x, v1->y + v2->y, v1->z + v2->z};
 }
 
-vec3 Vector_Sub(vec3 *v1, vec3 *v2) {
+vec3 Vector_Sub(const vec3 *v1, const vec3 *v2) {
   return (vec3){v1->x - v2->x, v1->y - v2->y, v1->z - v2->z};
 }
 
-vec3 Vector_Mul(vec3 *v1, float k) {
+vec3 Vector_Mul(const vec3 *v1, const float k) {
   return (vec3){v1->x * k, v1->y * k, v1->z * k};
 }
 
-vec3 Vector_Div(vec3 *v1, float k) {
+vec3 Vector_Div(const vec3 *v1, const float k) {
   return (vec3){v1->x / k, v1->y / k, v1->z / k};
 }
 
-float Vector_DotProduct(vec3 *v1, vec3 *v2) {
+float Vector_DotProduct(const vec3 *v1, const vec3 *v2) {
   return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
 }
 
-float Vector_Length(vec3 *v) { return sqrtf(Vector_DotProduct(v, v)); }
+float Vector_Length(const vec3 *v) { return sqrtf(Vector_DotProduct(v, v)); }
 
-vec3 Vector_Normalise(vec3 *v) {
+vec3 Vector_Normalise(const vec3 *v) {
   float l = Vector_Length(v);
   return (vec3){v->x / l, v->y / l, v->z / l};
 }
 
-vec3 Vector_CrossProduct(vec3 *v1, vec3 *v2) {
+vec3 Vector_CrossProduct(const vec3 *v1, const vec3 *v2) {
   vec3 v;
   v.x = v1->y * v2->z - v1->z * v2->y;
   v.y = v1->z * v2->x - v1->x * v2->z;
@@ -176,3 +162,20 @@ vec3 Vector_CrossProduct(vec3 *v1, vec3 *v2) {
 //   matRotY->m[2][2] = cosf(fTheta);
 //   matRotY->m[3][3] = 1;
 // }
+
+// void MultiplyMatrixVector(vec3 *i, vec3 *o, mat4 *m) {
+//   float w = 1.0f;
+//   o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] +
+//   m->m[3][0]; o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z *
+//   m->m[2][1] + m->m[3][1]; o->z = i->x * m->m[0][2] + i->y * m->m[1][2] +
+//   i->z * m->m[2][2] + m->m[3][2];
+//
+//   w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
+//
+//   if (w != 0.0f) {
+//     o->x /= w;
+//     o->y /= w;
+//     o->z /= w;
+//   }
+// }
+//
