@@ -2,7 +2,7 @@
 
 ** Made with SDL2 and C **
 
-[demo]: ./recording.mkv
+![](https://github.com/Nvim/3d/blob/main/demo.gif)
 
 ## Features
 
