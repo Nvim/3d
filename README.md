@@ -2,6 +2,8 @@
 
 ** Made with SDL2 and C **
 
+[demo]: ./recording.mkv
+
 ## Features
 
 - .obj models import
